@@ -286,6 +286,138 @@
       color: #64748B;
       margin-top: 6px;
     }
+
+    /* ===== MODAL KONFIRMASI BIODATA ===== */
+    .confirm-biodata-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.65);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+
+    .confirm-biodata-overlay.show {
+      display: flex;
+    }
+
+    .confirm-biodata-box {
+      width: 100%;
+      max-width: 480px;
+      background: white;
+      border-radius: 28px;
+      padding: 28px 28px 32px;
+      text-align: center;
+      animation: modalBiodataIn .25s ease;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    }
+
+    @keyframes modalBiodataIn {
+      from {
+        opacity: 0;
+        transform: translateY(16px) scale(.96);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .confirm-biodata-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: #DBEAFE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+    }
+
+    .confirm-biodata-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+
+    .confirm-biodata-desc {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+
+    .data-preview {
+      background: var(--bg);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 24px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    .data-preview-item {
+      display: flex;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .data-preview-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .data-preview-label {
+      width: 100px;
+      font-weight: 700;
+      color: var(--navy);
+      flex-shrink: 0;
+    }
+
+    .data-preview-value {
+      color: var(--gray);
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .confirm-biodata-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .confirm-biodata-btn {
+      flex: 1;
+      border: none;
+      border-radius: 14px;
+      padding: 13px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .confirm-biodata-btn.cancel {
+      background: #F1F5F9;
+      color: var(--gray);
+    }
+
+    .confirm-biodata-btn.cancel:hover {
+      background: #E2E8F0;
+    }
+
+    .confirm-biodata-btn.submit {
+      background: var(--blue);
+      color: white;
+    }
+
+    .confirm-biodata-btn.submit:hover {
+      background: var(--blue-dk);
+    }
   </style>
 </head>
 <body>
@@ -400,7 +532,21 @@
 
 <footer>
   <p>© 2026 SMKN 3 SOPPENG</p>
-  <p style="margin-top:2px;">Develop by @scoyamm812</p>
+
+  <p style="margin-top:2px;">
+    Develop by 
+    <a 
+      href="https://www.instagram.com/scoyamm812" 
+      target="_blank"
+      style="
+        color:#2563EB;
+        text-decoration:none;
+        font-weight:600;
+      "
+    >
+      @scoyamm812
+    </a>
+  </p>
 </footer>
 
 <div id="toast" class="toast"></div>
@@ -410,6 +556,53 @@
   <div class="loading-spinner-lg"></div>
   <div class="loading-text">Memuat Data Siswa...</div>
   <div class="loading-subtext">Mohon tunggu sebentar</div>
+</div>
+
+<!-- MODAL KONFIRMASI BIODATA SEBELUM MULAI TES -->
+<div class="confirm-biodata-overlay" id="confirmBiodataModal">
+  <div class="confirm-biodata-box">
+    <div class="confirm-biodata-icon">
+      📋
+    </div>
+    <div class="confirm-biodata-title">
+      Konfirmasi Biodata
+    </div>
+    <div class="confirm-biodata-desc">
+      Pastikan data diri Anda sudah benar sebelum melanjutkan ke tes.
+    </div>
+
+    <div class="data-preview" id="dataPreview">
+      <div class="data-preview-item">
+        <span class="data-preview-label">Nama:</span>
+        <span class="data-preview-value" id="previewNama">-</span>
+      </div>
+      <div class="data-preview-item">
+        <span class="data-preview-label">NISN:</span>
+        <span class="data-preview-value" id="previewNisn">-</span>
+      </div>
+      <div class="data-preview-item">
+        <span class="data-preview-label">Asal Sekolah:</span>
+        <span class="data-preview-value" id="previewSekolah">-</span>
+      </div>
+      <div class="data-preview-item">
+        <span class="data-preview-label">Alamat:</span>
+        <span class="data-preview-value" id="previewAlamat">-</span>
+      </div>
+      <div class="data-preview-item">
+        <span class="data-preview-label">Ekskul:</span>
+        <span class="data-preview-value" id="previewEkskul">-</span>
+      </div>
+    </div>
+
+    <div class="confirm-biodata-actions">
+      <button class="confirm-biodata-btn cancel" id="cancelConfirmBtn">
+        Kembali
+      </button>
+      <button class="confirm-biodata-btn submit" id="confirmSubmitBtn">
+        Ya, Lanjutkan Tes
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -541,7 +734,6 @@
       console.error("Gagal memuat DataSiswa:", err);
       showToast(`❌ Gagal memuat data: ${err.message}`, "error");
       
-      // Jika gagal loading, tetap hilangkan overlay
       if (sessionStorage.getItem("showLoading") === "true") {
         sessionStorage.removeItem("showLoading");
         const overlay = document.getElementById("loadingOverlay");
@@ -640,43 +832,49 @@
 
   // ==================== CEK TES SUDAH SELESAI (BLOKIR) ====================
   function checkPreviousSubmission() {
-
-    // jika tes sudah selesai
     if (localStorage.getItem("tesSelesai") === "true") {
-
       const nama = localStorage.getItem("namaSiswa") || "Siswa";
-
-      alert(
-        `${nama}, Anda sudah menyelesaikan tes bakat dan tidak dapat mengerjakan ulang.`
-      );
-
+      alert(`${nama}, Anda sudah menyelesaikan tes bakat dan tidak dapat mengerjakan ulang.`);
       window.location.href = "index.html";
       return;
     }
 
-    // jika biodata sudah pernah diisi tapi tes belum selesai
     if (localStorage.getItem("biodataSubmitted") === "true") {
-
       const namaTersimpan = localStorage.getItem("namaSiswa");
-
-      if (
-        namaTersimpan &&
-        confirm(
-          `Halo ${namaTersimpan}, Anda sudah mengisi biodata.\nLanjutkan ke tes?`
-        )
-      ) {
-
+      if (namaTersimpan && confirm(`Halo ${namaTersimpan}, Anda sudah mengisi biodata.\nLanjutkan ke tes?`)) {
         window.location.href = "testbakat.html";
-
       } else {
-
         localStorage.removeItem("biodataSubmitted");
       }
     }
   }
 
-  // ==================== SUBMIT BIODATA (DENGAN VALIDASI NISN) ====================
-  async function submitForm() {
+  // ==================== MODAL KONFIRMASI BIODATA ====================
+  function openConfirmModal() {
+    // Ambil data dari form
+    const nama = document.getElementById('nama').value.trim();
+    const nisn = document.getElementById('nisn').value.trim();
+    const sekolah = document.getElementById('sekolah').value.trim();
+    const alamat = document.getElementById('alamat').value.trim();
+    const ekskulList = Array.from(selectedEkskul).join(", ");
+
+    // Update preview
+    document.getElementById('previewNama').textContent = nama || "-";
+    document.getElementById('previewNisn').textContent = nisn || "-";
+    document.getElementById('previewSekolah').textContent = sekolah || "-";
+    document.getElementById('previewAlamat').textContent = alamat || "-";
+    document.getElementById('previewEkskul').textContent = ekskulList || "-";
+
+    // Tampilkan modal
+    document.getElementById('confirmBiodataModal').classList.add('show');
+  }
+
+  function closeConfirmModal() {
+    document.getElementById('confirmBiodataModal').classList.remove('show');
+  }
+
+  // ==================== VALIDASI SEBELUM BUKA MODAL ====================
+  function validateBeforeConfirm() {
     const nama = document.getElementById('nama').value.trim();
     const nisn = document.getElementById('nisn').value.trim();
     const sekolah = document.getElementById('sekolah').value.trim();
@@ -687,15 +885,25 @@
     const v3 = validate('sekolah', 'err-sekolah', !sekolah);
     const v4 = validate('alamat', 'err-alamat', !alamat);
 
-    const ekskulErr = document.getElementById('err-ekskul');
     const v5 = selectedEkskul.size > 0;
+    const ekskulErr = document.getElementById('err-ekskul');
     if (!v5) ekskulErr.classList.add('show'); 
     else ekskulErr.classList.remove('show');
 
     if (!(v1 && v2 && v3 && v4 && v5)) {
       showToast("❌ Mohon lengkapi data dengan benar", "error");
-      return;
+      return false;
     }
+
+    return true;
+  }
+
+  // ==================== SUBMIT BIODATA (DIPANGGIL SETELAH KONFIRMASI) ====================
+  async function submitFormAfterConfirm() {
+    const nama = document.getElementById('nama').value.trim();
+    const nisn = document.getElementById('nisn').value.trim();
+    const sekolah = document.getElementById('sekolah').value.trim();
+    const alamat = document.getElementById('alamat').value.trim();
 
     const submitBtn = document.getElementById('submitBtn');
     const btnText = document.getElementById('btnText');
@@ -739,42 +947,22 @@
           window.location.href = "testbakat.html";
         }, 1500);
       } else {
-        
-        // jika NISN sudah pernah tes
-        if (
-          result.message &&
-          result.message.toLowerCase().includes("sudah pernah")
-        ) {
-          showToast(
-            "❌ NISN ini sudah pernah mengikuti tes bakat.",
-            "error"
-          );
-          
+        if (result.message && result.message.toLowerCase().includes("sudah pernah")) {
+          showToast("❌ NISN ini sudah pernah mengikuti tes bakat.", "error");
           submitBtn.disabled = false;
           btnText.innerHTML = originalText;
-          
           return;
         }
-        
         throw new Error(result.message || "Gagal menyimpan data");
       }
       
     } catch (error) {
       console.error("Error:", error);
-      
-      // Pesan error yang lebih jelas untuk NISN sudah tes
-      if (
-        error.message &&
-        error.message.toLowerCase().includes("sudah pernah")
-      ) {
-        showToast(
-          "❌ NISN tersebut sudah pernah mengikuti tes.",
-          "error"
-        );
+      if (error.message && error.message.toLowerCase().includes("sudah pernah")) {
+        showToast("❌ NISN tersebut sudah pernah mengikuti tes.", "error");
       } else {
         showToast("❌ " + error.message, "error");
       }
-      
       submitBtn.disabled = false;
       btnText.innerHTML = originalText;
     }
@@ -803,11 +991,24 @@
       }
     });
     
-    document.getElementById("submitBtn").addEventListener("click", submitForm);
+    // Tombol Mulai Tes: buka modal konfirmasi dulu
+    document.getElementById("submitBtn").addEventListener("click", function(e) {
+      if (validateBeforeConfirm()) {
+        openConfirmModal();
+      }
+    });
+    
+    // Tombol Kembali di modal
+    document.getElementById("cancelConfirmBtn").addEventListener("click", closeConfirmModal);
+    
+    // Tombol Ya, Lanjutkan Tes di modal
+    document.getElementById("confirmSubmitBtn").addEventListener("click", function() {
+      closeConfirmModal();
+      submitFormAfterConfirm();
+    });
   }
 
   async function init() {
-    // Cek dan tampilkan loading dari dashboard
     if (sessionStorage.getItem("showLoading") === "true") {
       const overlay = document.getElementById("loadingOverlay");
       if (overlay) {
@@ -824,7 +1025,6 @@
     if (connected) {
       await loadDataSiswa();
     } else {
-      // Jika koneksi gagal, hilangkan overlay
       if (sessionStorage.getItem("showLoading") === "true") {
         sessionStorage.removeItem("showLoading");
         const overlay = document.getElementById("loadingOverlay");
@@ -838,7 +1038,6 @@
   init();
   
   window.retryConnection = retryConnection;
-  window.submitForm = submitForm;
 </script>
 </body>
 </html>
