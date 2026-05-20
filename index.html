@@ -296,6 +296,127 @@
       to { transform: rotate(360deg); }
     }
 
+    /* ===== MODAL CEK HASIL ===== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 20px;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      animation: fadeUp .25s ease;
+    }
+
+    .modal-box h3 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      color: #64748B;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .modal-box input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .modal-box input:focus {
+      border-color: #2563EB;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-cancel,
+    .btn-check {
+      flex: 1;
+      height: 46px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-cancel {
+      background: #E2E8F0;
+    }
+
+    .btn-check {
+      background: #2563EB;
+      color: white;
+    }
+
+    #hasilContainer {
+      margin-top: 18px;
+    }
+
+    .hasil-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .hasil-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .hasil-grid {
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .hasil-item {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #E2E8F0;
+    }
+
+    .hasil-item strong {
+      display: block;
+      font-size: 18px;
+      color: #2563EB;
+    }
+
+    .error-text {
+      color: #DC2626;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
     /* ── ANIMATIONS ── */
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeUp   { from { opacity: 0; transform: translateY(14px);  } to { opacity: 1; transform: translateY(0); } }
@@ -476,7 +597,7 @@
           <path d="M5 12h14M12 5l7 7-7 7"/>
         </svg>
       </a>
-      <a href="#" class="btn-secondary">
+      <a href="#" class="btn-secondary" id="cekHasilBtn">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/>
         </svg>
@@ -515,17 +636,12 @@
 
 <footer>
   <p>© 2026 SMKN 3 SOPPENG</p>
-
   <p style="margin-top:2px;">
     Develop by 
     <a 
       href="https://www.instagram.com/scoyamm812" 
       target="_blank"
-      style="
-        color:#2563EB;
-        text-decoration:none;
-        font-weight:600;
-      "
+      style="color:#2563EB; text-decoration:none; font-weight:600;"
     >
       @scoyamm812
     </a>
@@ -539,24 +655,123 @@
   <div class="loading-subtext">Mohon tunggu sebentar</div>
 </div>
 
+<!-- MODAL CEK HASIL -->
+<div class="modal-overlay" id="modalCek">
+  <div class="modal-box">
+    <h3>Cek Hasil Tes</h3>
+    <p class="modal-subtitle">
+      Masukkan NISN untuk melihat hasil tes bakat dan minat.
+    </p>
+    <input type="text" id="nisnInput" placeholder="Masukkan NISN">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="closeModal">Batal</button>
+      <button class="btn-check" id="submitCek">Cek Hasil</button>
+    </div>
+    <div id="hasilContainer"></div>
+  </div>
+</div>
+
 <script>
-  const startBtn = document.getElementById("startTestBtn");
-  const loadingOverlay = document.getElementById("loadingOverlay");
+// =================================================
+// KONFIGURASI
+// =================================================
+// ⚠️ GANTI DENGAN URL APPS SCRIPT ANDA!
+const API_URL = "https://script.google.com/macros/s/AKfycbycsfvjKHWitXiauYbX-n7v6lnV6SNIUHrMTfjTAuz79Xk2flHS90EC3ZmFZo3eYgbAoQ/exec";
 
-  startBtn.addEventListener("click", function(e) {
-    e.preventDefault();
+// =================================================
+// DOM ELEMENTS
+// =================================================
+const startBtn = document.getElementById("startTestBtn");
+const loadingOverlay = document.getElementById("loadingOverlay");
+const cekBtn = document.getElementById("cekHasilBtn");
+const modalCek = document.getElementById("modalCek");
+const closeModal = document.getElementById("closeModal");
+const submitCek = document.getElementById("submitCek");
+const hasilContainer = document.getElementById("hasilContainer");
 
-    // tampilkan loading
-    loadingOverlay.classList.add("show");
+// =================================================
+// MULAI TES
+// =================================================
+startBtn.addEventListener("click", function(e) {
+  e.preventDefault();
 
-    // simpan status loading
-    sessionStorage.setItem("showLoading", "true");
+  loadingOverlay.classList.add("show");
+  sessionStorage.setItem("showLoading", "true");
 
-    // pindah halaman
-    setTimeout(() => {
-      window.location.href = "biodata.html";
-    }, 500);
-  });
+  setTimeout(() => {
+    window.location.href = "biodata.html";
+  }, 500);
+});
+
+// =================================================
+// BUKA MODAL CEK HASIL
+// =================================================
+cekBtn.addEventListener("click", function(e) {
+  e.preventDefault();
+  modalCek.classList.add("show");
+  document.getElementById("nisnInput").value = "";
+  hasilContainer.innerHTML = "";
+});
+
+// =================================================
+// TUTUP MODAL
+// =================================================
+closeModal.addEventListener("click", function() {
+  modalCek.classList.remove("show");
+});
+
+// Klik di luar modal juga menutup
+modalCek.addEventListener("click", function(e) {
+  if (e.target === modalCek) {
+    modalCek.classList.remove("show");
+  }
+});
+
+// =================================================
+// CEK HASIL TES
+// =================================================
+submitCek.addEventListener("click", async function() {
+  const nisn = document.getElementById("nisnInput").value.trim();
+
+  if (!nisn) {
+    hasilContainer.innerHTML = `
+      <p class="error-text">Masukkan NISN terlebih dahulu</p>
+    `;
+    return;
+  }
+
+  hasilContainer.innerHTML = `
+    <p style="font-size:13px;color:#64748B;">Memuat hasil tes...</p>
+  `;
+
+  try {
+    const response = await fetch(API_URL + "?action=getHasil&nisn=" + encodeURIComponent(nisn));
+    const result = await response.json();
+
+    if (result.status === "error") {
+      hasilContainer.innerHTML = `<p class="error-text">${result.message}</p>`;
+      return;
+    }
+
+    hasilContainer.innerHTML = `
+      <div class="hasil-card">
+        <div class="hasil-title">${result.nama}</div>
+        <p><strong>Kode RIASEC:</strong> ${result.kode}</p>
+        <div class="hasil-grid">
+          <div class="hasil-item"><span>R</span><strong>${result.R}</strong></div>
+          <div class="hasil-item"><span>I</span><strong>${result.I}</strong></div>
+          <div class="hasil-item"><span>A</span><strong>${result.A}</strong></div>
+          <div class="hasil-item"><span>S</span><strong>${result.S}</strong></div>
+          <div class="hasil-item"><span>E</span><strong>${result.E}</strong></div>
+          <div class="hasil-item"><span>C</span><strong>${result.C}</strong></div>
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error(error);
+    hasilContainer.innerHTML = `<p class="error-text">Gagal mengambil data hasil tes</p>`;
+  }
+});
 </script>
 
 </body>
