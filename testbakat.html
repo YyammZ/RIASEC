@@ -704,7 +704,7 @@
 <script>
 // ==================== KONFIGURASI ====================
 // ⚠️ GANTI URL INI DENGAN URL APPS SCRIPT ANDA!
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5enhN19yKLY7l-tVGTggKYA5uBRE2vz8kak401WClbrXD0wMEovmVZeOW27C_ZkTFqw/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycsfvjKHWitXiauYbX-n7v6lnV6SNIUHrMTfjTAuz79Xk2flHS90EC3ZmFZo3eYgbAoQ/exec";
 
 // ==================== GLOBAL VARIABLES ====================
 let allQuestions = [];
@@ -1121,12 +1121,7 @@ async function submitTest() {
   }
 }
 
-// ==================== FUNGSI KE DASHBOARD (SETELAH TES SELESAI) ====================
 function goDashboard() {
-  // hapus blokir keluar
-  window.onbeforeunload = null;
-  window.onpopstate = null;
-  
   window.location.href = "index.html";
 }
 
@@ -1151,46 +1146,6 @@ function checkBiodataAndInit() {
   
   return true;
 }
-
-// ==================== BLOKIR KELUAR HALAMAN ====================
-
-// cegah tombol back browser
-history.pushState(null, null, location.href);
-
-window.onpopstate = function () {
-  history.go(1);
-  
-  showToast(
-    "Tes sedang berlangsung, Anda tidak dapat keluar",
-    true
-  );
-};
-
-// cegah refresh / tutup tab
-window.addEventListener("beforeunload", function (e) {
-  e.preventDefault();
-  e.returnValue = "";
-});
-
-// cegah shortcut keyboard
-document.addEventListener("keydown", function (e) {
-
-  // F5
-  if (e.key === "F5") {
-    e.preventDefault();
-  }
-
-  // CTRL+R
-  if (e.ctrlKey && e.key.toLowerCase() === "r") {
-    e.preventDefault();
-  }
-
-  // ALT + LEFT
-  if (e.altKey && e.key === "ArrowLeft") {
-    e.preventDefault();
-  }
-
-});
 
 // ==================== INISIALISASI ====================
 if (checkBiodataAndInit()) {
