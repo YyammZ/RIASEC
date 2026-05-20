@@ -370,18 +370,6 @@
     .score-letter { font-size: 22px; font-weight: 800; color: var(--blue); }
     .score-num { font-size: 13px; font-weight: 700; color: var(--gray); margin-top: 4px; }
     
-    .rekomendasi-box {
-      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
-      border-radius: 16px;
-      padding: 20px 24px;
-      margin: 16px 0 24px;
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-    }
-    .rekomendasi-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--blue); margin-bottom: 8px; }
-    .rekomendasi-jurusan { font-size: 28px; font-weight: 800; color: var(--blue-dk); letter-spacing: 1px; }
-    
     .btn-dashboard {
       background: var(--blue); color: var(--white);
       border: none; border-radius: 12px;
@@ -652,23 +640,17 @@
   <h2 class="done-title">Tes Selesai!</h2>
   <p class="done-sub">Terima kasih telah menyelesaikan tes RIASEC.</p>
   <div class="score-grid" id="score-grid"></div>
-  <div id="rekomendasi-container"></div>
   <button class="btn-dashboard" onclick="goDashboard()">Kembali ke Dashboard</button>
 </div>
 
 <footer>
   <p>© 2026 SMKN 3 SOPPENG</p>
-
   <p style="margin-top:2px;">
     Develop by 
     <a 
       href="https://www.instagram.com/scoyamm812" 
       target="_blank"
-      style="
-        color:#2563EB;
-        text-decoration:none;
-        font-weight:600;
-      "
+      style="color:#2563EB; text-decoration:none; font-weight:600;"
     >
       @scoyamm812
     </a>
@@ -1073,13 +1055,7 @@ async function submitTest() {
     </div>
   `).join('');
   
-  document.getElementById('rekomendasi-container').innerHTML = `
-    <div class="rekomendasi-box">
-      <div class="rekomendasi-label">🎓 HASIL TES</div>
-      <div class="rekomendasi-jurusan">${rekomendasiJurusan}</div>
-    </div>
-  `;
-  
+  // Kirim hasil ke server menggunakan FormData (CORS friendly)
   const data = {
     idTes: idTes,
     nama: nama,
