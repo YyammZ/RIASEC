@@ -696,6 +696,65 @@ let totalQuestions = 0;
 let dataLoaded = false;
 let jurusanData = [];
 
+// ==================== BLOKIR KELUAR HALAMAN ====================
+// Cegah tombol back browser/HP
+history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+  history.go(1);
+  showToast("❌ Tes sedang berlangsung, Anda tidak dapat keluar", true);
+};
+
+// Cegah refresh / tutup tab
+window.addEventListener("beforeunload", function (e) {
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+// Cegah shortcut keyboard
+document.addEventListener("keydown", function (e) {
+  // F5
+  if (e.key === "F5") {
+    e.preventDefault();
+  }
+  // CTRL+R
+  if (e.ctrlKey && e.key.toLowerCase() === "r") {
+    e.preventDefault();
+  }
+  // CTRL+SHIFT+R
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "r") {
+    e.preventDefault();
+  }
+  // ALT + LEFT (back)
+  if (e.altKey && e.key === "ArrowLeft") {
+    e.preventDefault();
+  }
+  // ALT + RIGHT (forward)
+  if (e.altKey && e.key === "ArrowRight") {
+    e.preventDefault();
+  }
+  // Cegah pull-to-refresh pada touch device (swipe down)
+  if (e.touches && e.touches.length === 1 && window.scrollY === 0) {
+    const touchY = e.touches[0].clientY;
+    if (touchY < 30) {
+      e.preventDefault();
+    }
+  }
+});
+
+// Cegah refresh dengan cara menarik layar ke bawah (touch device)
+let touchStartY = 0;
+document.addEventListener('touchstart', function(e) {
+  touchStartY = e.touches[0].clientY;
+}, { passive: false });
+
+document.addEventListener('touchmove', function(e) {
+  const touchY = e.touches[0].clientY;
+  if (touchY > touchStartY && window.scrollY === 0) {
+    e.preventDefault();
+  }
+}, { passive: false });
+
 // ==================== LOADING HELPER ====================
 function hideLoader() {
   const loader = document.getElementById("pageLoader");
@@ -1097,7 +1156,12 @@ async function submitTest() {
   }
 }
 
+// ==================== FUNGSI KE DASHBOARD (HAPUS BLOKIR) ====================
 function goDashboard() {
+  // Hapus blokir keluar
+  window.onbeforeunload = null;
+  window.onpopstate = null;
+  
   window.location.href = "index.html";
 }
 
