@@ -370,6 +370,18 @@
     .score-letter { font-size: 22px; font-weight: 800; color: var(--blue); }
     .score-num { font-size: 13px; font-weight: 700; color: var(--gray); margin-top: 4px; }
     
+    .rekomendasi-box {
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 16px 0 24px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    .rekomendasi-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--blue); margin-bottom: 8px; }
+    .rekomendasi-jurusan { font-size: 28px; font-weight: 800; color: var(--blue-dk); letter-spacing: 1px; }
+    
     .btn-dashboard {
       background: var(--blue); color: var(--white);
       border: none; border-radius: 12px;
@@ -640,11 +652,13 @@
   <h2 class="done-title">Tes Selesai!</h2>
   <p class="done-sub">Terima kasih telah menyelesaikan tes RIASEC.</p>
   <div class="score-grid" id="score-grid"></div>
+  <div id="rekomendasi-container"></div>
   <button class="btn-dashboard" onclick="goDashboard()">Kembali ke Dashboard</button>
 </div>
 
 <footer>
   <p>© 2026 SMKN 3 SOPPENG</p>
+
   <p style="margin-top:2px;">
     Develop by 
     <a 
@@ -1059,7 +1073,13 @@ async function submitTest() {
     </div>
   `).join('');
   
-  // Kirim hasil ke server menggunakan FormData (CORS friendly)
+  document.getElementById('rekomendasi-container').innerHTML = `
+    <div class="rekomendasi-box">
+      <div class="rekomendasi-label">🎓 HASIL TES</div>
+      <div class="rekomendasi-jurusan">${rekomendasiJurusan}</div>
+    </div>
+  `;
+  
   const data = {
     idTes: idTes,
     nama: nama,
@@ -1101,7 +1121,12 @@ async function submitTest() {
   }
 }
 
+// ==================== FUNGSI KE DASHBOARD (SETELAH TES SELESAI) ====================
 function goDashboard() {
+  // hapus blokir keluar
+  window.onbeforeunload = null;
+  window.onpopstate = null;
+  
   window.location.href = "index.html";
 }
 
@@ -1126,6 +1151,46 @@ function checkBiodataAndInit() {
   
   return true;
 }
+
+// ==================== BLOKIR KELUAR HALAMAN ====================
+
+// cegah tombol back browser
+history.pushState(null, null, location.href);
+
+window.onpopstate = function () {
+  history.go(1);
+  
+  showToast(
+    "Tes sedang berlangsung, Anda tidak dapat keluar",
+    true
+  );
+};
+
+// cegah refresh / tutup tab
+window.addEventListener("beforeunload", function (e) {
+  e.preventDefault();
+  e.returnValue = "";
+});
+
+// cegah shortcut keyboard
+document.addEventListener("keydown", function (e) {
+
+  // F5
+  if (e.key === "F5") {
+    e.preventDefault();
+  }
+
+  // CTRL+R
+  if (e.ctrlKey && e.key.toLowerCase() === "r") {
+    e.preventDefault();
+  }
+
+  // ALT + LEFT
+  if (e.altKey && e.key === "ArrowLeft") {
+    e.preventDefault();
+  }
+
+});
 
 // ==================== INISIALISASI ====================
 if (checkBiodataAndInit()) {
