@@ -377,44 +377,25 @@
       margin-top: 18px;
     }
 
-    .hasil-card {
+    .info-card {
       background: #F8FAFC;
       border: 1px solid #E2E8F0;
       border-radius: 14px;
       padding: 16px;
-    }
-
-    .hasil-title {
-      font-size: 16px;
-      font-weight: 800;
-      margin-bottom: 10px;
-    }
-
-    .hasil-grid {
-      display: grid;
-      grid-template-columns: repeat(2,1fr);
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .hasil-item {
-      background: white;
-      border-radius: 10px;
-      padding: 10px;
       text-align: center;
-      border: 1px solid #E2E8F0;
     }
 
-    .hasil-item strong {
-      display: block;
+    .info-title {
       font-size: 18px;
+      font-weight: 800;
       color: #2563EB;
+      margin-bottom: 12px;
     }
 
-    .error-text {
-      color: #DC2626;
-      font-size: 13px;
-      margin-top: 10px;
+    .info-message {
+      font-size: 14px;
+      color: #334155;
+      line-height: 1.6;
     }
 
     /* ── ANIMATIONS ── */
@@ -660,24 +641,23 @@
   <div class="modal-box">
     <h3>Cek Hasil Tes</h3>
     <p class="modal-subtitle">
-      Masukkan NISN untuk melihat hasil tes bakat dan minat.
+      Informasi hasil tes bakat dan minat
     </p>
-    <input type="text" id="nisnInput" placeholder="Masukkan NISN">
-    <div class="modal-actions">
-      <button class="btn-cancel" id="closeModal">Batal</button>
-      <button class="btn-check" id="submitCek">Cek Hasil</button>
+    <div class="info-card">
+      <div class="info-title">
+        📋 Informasi
+      </div>
+      <div class="info-message">
+        Silakan tunggu informasi selanjutnya dari guru BK.
+      </div>
     </div>
-    <div id="hasilContainer"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="closeModal">Tutup</button>
+    </div>
   </div>
 </div>
 
 <script>
-// =================================================
-// KONFIGURASI
-// =================================================
-// ⚠️ GANTI DENGAN URL APPS SCRIPT ANDA!
-const API_URL = "https://script.google.com/macros/s/AKfycbycsfvjKHWitXiauYbX-n7v6lnV6SNIUHrMTfjTAuz79Xk2flHS90EC3ZmFZo3eYgbAoQ/exec";
-
 // =================================================
 // DOM ELEMENTS
 // =================================================
@@ -686,8 +666,6 @@ const loadingOverlay = document.getElementById("loadingOverlay");
 const cekBtn = document.getElementById("cekHasilBtn");
 const modalCek = document.getElementById("modalCek");
 const closeModal = document.getElementById("closeModal");
-const submitCek = document.getElementById("submitCek");
-const hasilContainer = document.getElementById("hasilContainer");
 
 // =================================================
 // MULAI TES
@@ -704,13 +682,11 @@ startBtn.addEventListener("click", function(e) {
 });
 
 // =================================================
-// BUKA MODAL CEK HASIL
+// BUKA MODAL CEK HASIL (LANGSUNG TAMPIL INFORMASI)
 // =================================================
 cekBtn.addEventListener("click", function(e) {
   e.preventDefault();
   modalCek.classList.add("show");
-  document.getElementById("nisnInput").value = "";
-  hasilContainer.innerHTML = "";
 });
 
 // =================================================
@@ -724,52 +700,6 @@ closeModal.addEventListener("click", function() {
 modalCek.addEventListener("click", function(e) {
   if (e.target === modalCek) {
     modalCek.classList.remove("show");
-  }
-});
-
-// =================================================
-// CEK HASIL TES
-// =================================================
-submitCek.addEventListener("click", async function() {
-  const nisn = document.getElementById("nisnInput").value.trim();
-
-  if (!nisn) {
-    hasilContainer.innerHTML = `
-      <p class="error-text">Masukkan NISN terlebih dahulu</p>
-    `;
-    return;
-  }
-
-  hasilContainer.innerHTML = `
-    <p style="font-size:13px;color:#64748B;">Memuat hasil tes...</p>
-  `;
-
-  try {
-    const response = await fetch(API_URL + "?action=getHasil&nisn=" + encodeURIComponent(nisn));
-    const result = await response.json();
-
-    if (result.status === "error") {
-      hasilContainer.innerHTML = `<p class="error-text">${result.message}</p>`;
-      return;
-    }
-
-    hasilContainer.innerHTML = `
-      <div class="hasil-card">
-        <div class="hasil-title">${result.nama}</div>
-        <p><strong>Kode RIASEC:</strong> ${result.kode}</p>
-        <div class="hasil-grid">
-          <div class="hasil-item"><span>R</span><strong>${result.R}</strong></div>
-          <div class="hasil-item"><span>I</span><strong>${result.I}</strong></div>
-          <div class="hasil-item"><span>A</span><strong>${result.A}</strong></div>
-          <div class="hasil-item"><span>S</span><strong>${result.S}</strong></div>
-          <div class="hasil-item"><span>E</span><strong>${result.E}</strong></div>
-          <div class="hasil-item"><span>C</span><strong>${result.C}</strong></div>
-        </div>
-      </div>
-    `;
-  } catch (error) {
-    console.error(error);
-    hasilContainer.innerHTML = `<p class="error-text">Gagal mengambil data hasil tes</p>`;
   }
 });
 </script>
